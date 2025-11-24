@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cek Kesehatan Mental (Simulasi)</title>
+    <style>
+        :root {
+            --primary: #6C63FF;
+            --secondary: #2F2E41;
+            --accent: #FF6584;
+            --bg: #f0f2f5;
+            --card-bg: #ffffff;
+            --text: #333333;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            background: var(--card-bg);
+            width: 100%;
+            max-width: 500px;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            overflow: hidden;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        /* Header Section */
+        .header {
+            background: var(--primary);
+            color: white;
+            padding: 30px 20px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 1.5rem;
+            margin-bottom: 5px;
+        }
+
+        .header p {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        /* Content Body */
+        .content {
+            padding: 30px;
+            min-height: 300px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        /* Buttons */
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            background: var(--bg);
+            color: var(--text);
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            margin-bottom: 15px;
+            transition: background 0.2s, transform 0.1s;
+            text-align: left;
+        }
+
+        .btn:hover {
+            background: #e2e6ea;
+        }
+
+        .btn:active {
+            transform: scale(0.98);
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+            text-align: center;
+        }
+
+        .btn-primary:hover {
+            background: #5a52d5;
+        }
+
+        /* Progress Bar */
+        .progress-container {
+            width: 100%;
+            height: 6px;
+            background: #e0e0e0;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: var(--accent);
+            width: 0%;
+            transition: width 0.4s ease;
+        }
+
+        /* Animations */
+        .fade-in {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Result Styling */
+        .result-box {
+            text-align: center;
+        }
+        
+        .disclaimer-box {
+            background-color: #fff3cd;
+            border: 1px solid #ffeeba;
+            color: #856404;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            font-size: 0.85rem;
+            line-height: 1.5;
+        }
+
+        .highlight {
+            color: var(--accent);
+            font-weight: bold;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="progress-container">
+            <div class="progress-bar" id="progressBar"></div>
+        </div>
+
+        <div class="header">
+            <h1 id="titleText">Self-Check Mental</h1>
+            <p id="subtitleText">Jawab jujur sesuai perasaanmu.</p>
+        </div>
+
+        <div class="content" id="quizContent">
+            <div class="text-center fade-in">
+                <p style="margin-bottom: 20px; line-height: 1.6;">
+                    Kuis ini sering digunakan di media sosial untuk menentukan "kepribadian" atau "gangguan" kamu. Apakah kamu siap mengetahui hasilnya?
+                </p>
+                <button class="btn btn-primary" onclick="startQuiz()">Mulai Tes</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Data Pertanyaan (Sengaja dibuat ambigu seperti kuis viral)
+        const questions = [
+            {
+                question: "Apakah kamu sering merasa mood berubah drastis dalam satu hari?",
+                options: ["Ya, sering banget", "Kadang-kadang", "Jarang", "Tidak pernah"]
+            },
+            {
+                question: "Apakah kamu merasa terganggu jika melihat benda tidak tertata rapi?",
+                options: ["Sangat terganggu!", "Agak risih sih", "Biasa saja", "Gak peduli"]
+            },
+            {
+                question: "Apakah kamu sering merasa lelah padahal tidak melakukan aktivitas fisik berat?",
+                options: ["Setiap hari", "Sering", "Kadang", "Jarang"]
+            },
+            {
+                question: "Apakah kamu sering overthinking di malam hari?",
+                options: ["Selalu!", "Sering", "Kadang", "Tidurku nyenyak"]
+            }
+        ];
+
+        let currentQuestionIndex = 0;
+
+        // Fungsi Memulai Kuis
+        function startQuiz() {
+            currentQuestionIndex = 0;
+            renderQuestion();
+        }
+
+        // Fungsi Menampilkan Pertanyaan
+        function renderQuestion() {
+            const contentDiv = document.getElementById('quizContent');
+            const progressBar = document.getElementById('progressBar');
+            
+            // Update Progress Bar
+            const progress = ((currentQuestionIndex) / questions.length) * 100;
+            progressBar.style.width = `${progress}%`;
+
+            // Template Pertanyaan
+            const questionData = questions[currentQuestionIndex];
+            
+            let html = `
+                <div class="fade-in">
+                    <h3 style="margin-bottom: 25px; font-weight: 600;">${questionData.question}</h3>
+                    <div class="options-list">
+            `;
+
+            questionData.options.forEach((option) => {
+                html += `<button class="btn" onclick="handleAnswer()">${option}</button>`;
+            });
+
+            html += `
+                    </div>
+                </div>
+            `;
+
+            contentDiv.innerHTML = html;
+        }
+
+        // Fungsi Handle Jawaban (Logika Satir)
+        function handleAnswer() {
+            currentQuestionIndex++;
+            if (currentQuestionIndex < questions.length) {
+                renderQuestion();
+            } else {
+                showResult();
+            }
+        }
+
+        // Fungsi Menampilkan Hasil (The Educational Twist)
+        function showResult() {
+            const contentDiv = document.getElementById('quizContent');
+            const progressBar = document.getElementById('progressBar');
+            const titleText = document.getElementById('titleText');
+            const subtitleText = document.getElementById('subtitleText');
+
+            progressBar.style.width = '100%';
+            titleText.innerText = "Hasil Analisa";
+            subtitleText.innerText = "Berdasarkan jawabanmu...";
+
+            // Pesan hasil yang memberikan 'reality check'
+            contentDiv.innerHTML = `
+                <div class="result-box fade-in">
+                    <h2 style="color: var(--primary); margin-bottom: 15px;">Tunggu Dulu.</h2>
+                    
+                    <p style="margin-bottom: 15px; font-size: 1.1rem;">
+                        Jika ini adalah TikTok atau kuis online sembarangan, kamu mungkin akan didiagnosa terkena <span class="highlight">Bipolar, OCD, atau Depresi</span> hanya karena kamu menjawab "Ya".
+                    </p>
+
+                    <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;">
+
+                    <p style="font-weight: 600; margin-bottom: 10px;">Kenyataannya:</p>
+                    <p style="margin-bottom: 20px;">
+                        Perubahan mood, suka kerapian, dan rasa lelah adalah <strong>emosi manusia yang wajar</strong>. Memiliki gejala bukan berarti memiliki gangguan.
+                    </p>
+
+                    <div class="disclaimer-box">
+                        <strong>Penting:</strong><br>
+                        Diagnosa kesehatan mental hanya boleh dilakukan oleh profesional (Psikolog/Psikiater) melalui observasi mendalam, bukan lewat kuis 4 pertanyaan di internet.
+                    </div>
+
+                    <button class="btn btn-primary" style="margin-top: 20px;" onclick="location.reload()">Coba Lagi</button>
+                </div>
+            `;
+        }
+    </script>
+</body>
+</html>
